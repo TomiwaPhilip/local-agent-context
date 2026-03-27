@@ -56,7 +56,15 @@ export interface Session extends SessionRow {}
 
 // ─── Tool Parameter Schemas ─────────────────────────────────────────────────
 
+// Shared workspace parameter — agents pass this dynamically so the server can
+// be configured once globally and work across any project.
+const workspaceParam = z.string().optional().describe(
+  "Absolute path to the project workspace. Required for workspace-scoped memories. " +
+  "Agents should pass the current project root (e.g. the workspaceFolder)."
+);
+
 export const StoreMemorySchema = {
+  workspace: workspaceParam,
   type: MemoryType,
   title: z.string().describe("Short descriptive title for the memory"),
   content: z.string().describe("The full content/body of the memory"),
@@ -71,6 +79,7 @@ export const StoreMemorySchema = {
 };
 
 export const RecallSchema = {
+  workspace: workspaceParam,
   query: z.string().describe("Search query — matched against titles, content, and tags via full-text search"),
   type: MemoryType.optional().describe("Filter by memory type"),
   tags: z.array(z.string()).optional().describe("Filter by tags (matches any)"),
@@ -80,6 +89,7 @@ export const RecallSchema = {
 };
 
 export const UpdateMemorySchema = {
+  workspace: workspaceParam,
   id: z.string().describe("The memory ID to update"),
   title: z.string().optional().describe("New title"),
   content: z.string().optional().describe("New content"),
@@ -90,11 +100,13 @@ export const UpdateMemorySchema = {
 };
 
 export const DeleteMemorySchema = {
+  workspace: workspaceParam,
   id: z.string().describe("The memory ID to delete"),
   hard: z.boolean().optional().describe("If true, permanently delete. Otherwise archive (soft-delete). Default: false"),
 };
 
 export const ListMemoriesSchema = {
+  workspace: workspaceParam,
   type: MemoryType.optional().describe("Filter by memory type"),
   tags: z.array(z.string()).optional().describe("Filter by tags (matches any)"),
   scope: MemoryScope.optional().describe("Filter by scope"),
@@ -103,15 +115,22 @@ export const ListMemoriesSchema = {
   offset: z.number().min(0).optional().describe("Offset for pagination (default: 0)"),
 };
 
+export const GetContextSchema = {
+  workspace: workspaceParam,
+};
+
 export const StartSessionSchema = {
+  workspace: workspaceParam,
   summary: z.string().optional().describe("Optional initial summary/goal for this session"),
 };
 
 export const EndSessionSchema = {
+  workspace: workspaceParam,
   summary: z.string().describe("Summary of what was accomplished in this session. This becomes a searchable memory."),
 };
 
 export const LogDecisionSchema = {
+  workspace: workspaceParam,
   title: z.string().describe("Short title for the decision (e.g., 'Use SQLite over PostgreSQL')"),
   decision: z.string().describe("What was decided"),
   rationale: z.string().describe("Why this decision was made"),
@@ -121,6 +140,7 @@ export const LogDecisionSchema = {
 };
 
 export const AddLessonSchema = {
+  workspace: workspaceParam,
   title: z.string().describe("Short title for the lesson"),
   lesson: z.string().describe("What was learned"),
   context: z.string().optional().describe("The situation/context where this lesson was learned"),

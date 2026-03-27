@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createDatabaseManager } from "./db/connection.js";
+import { ConnectionPool } from "./db/connection.js";
 import { createServer } from "./server.js";
 
 // ─── CLI Argument Parsing ───────────────────────────────────────────────────
 
-function getWorkspacePath(): string {
-  // Check --workspace flag
+function getDefaultWorkspace(): string | undefined {
+  // Check --workspace flag (optional — sets default workspace for tools)
   const wsIndex = process.argv.indexOf("--workspace");
   if (wsIndex !== -1 && process.argv[wsIndex + 1]) {
     return process.argv[wsIndex + 1];
@@ -18,27 +18,27 @@ function getWorkspacePath(): string {
     return process.env.WORKSPACE_PATH;
   }
 
-  // Fall back to current working directory
-  return process.cwd();
+  // No default — agents will pass workspace dynamically per tool call
+  return undefined;
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  const workspacePath = getWorkspacePath();
+  const defaultWorkspace = getDefaultWorkspace();
 
-  const manager = createDatabaseManager(workspacePath);
-  const server = createServer(manager);
+  const pool = new ConnectionPool(defaultWorkspace);
+  const server = createServer(pool);
   const transport = new StdioServerTransport();
 
   // Graceful shutdown
   process.on("SIGINT", () => {
-    manager.close();
+    pool.close();
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
-    manager.close();
+    pool.close();
     process.exit(0);
   });
 

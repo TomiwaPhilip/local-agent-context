@@ -8,9 +8,55 @@ Every time you start a new conversation with an AI coding agent, it forgets ever
 
 ## Quick Start
 
-### VS Code (GitHub Copilot)
+### Global Setup (Recommended)
 
-Add to `.vscode/mcp.json`:
+Configure once — works across all projects. Agents pass the workspace path dynamically.
+
+**VS Code (GitHub Copilot)** — add to User Settings (`MCP: Open User Configuration`):
+
+```json
+{
+  "servers": {
+    "agent-context": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "local-agent-context"]
+    }
+  }
+}
+```
+
+**Cursor** — add to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "agent-context": {
+      "command": "npx",
+      "args": ["-y", "local-agent-context"]
+    }
+  }
+}
+```
+
+**Claude Desktop** — add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "agent-context": {
+      "command": "npx",
+      "args": ["-y", "local-agent-context"]
+    }
+  }
+}
+```
+
+### Per-Project Setup (Alternative)
+
+If you prefer a fixed workspace, pass `--workspace` at startup:
+
+**VS Code** — add to `.vscode/mcp.json`:
 
 ```json
 {
@@ -24,44 +70,21 @@ Add to `.vscode/mcp.json`:
 }
 ```
 
-### Cursor
+## How It Works
 
-Add to `.cursor/mcp.json`:
+**Dynamic workspace**: Every tool accepts an optional `workspace` parameter. Agents pass their current project root (e.g., `workspaceFolder`) per call. The server lazily opens and caches workspace databases on demand.
 
-```json
-{
-  "mcpServers": {
-    "agent-context": {
-      "command": "npx",
-      "args": ["-y", "local-agent-context", "--workspace", "/absolute/path/to/your/project"]
-    }
-  }
-}
-```
+**Fallback chain**: Tool `workspace` arg → `--workspace` CLI flag → `WORKSPACE_PATH` env var → global-only mode.
 
-### Claude Desktop
-
-Add to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "agent-context": {
-      "command": "npx",
-      "args": ["-y", "local-agent-context", "--workspace", "/absolute/path/to/your/project"]
-    }
-  }
-}
-```
-
-## Storage
-
+**Two-tier storage**:
 - **Workspace memory**: `<project>/.agent-context/memory.db` — project-specific memories
 - **Global memory**: `~/.local-agent-context/global.db` — cross-project preferences and patterns
 
 Both are SQLite databases with FTS5 full-text search. Add `.agent-context/` to your `.gitignore`.
 
 ## Tools (10)
+
+All tools accept an optional `workspace` parameter — the absolute path to the project root. Pass it so the server knows which project's memory to use.
 
 ### Core Memory
 
@@ -115,17 +138,19 @@ Both are SQLite databases with FTS5 full-text search. Add `.agent-context/` to y
 
 ## Typical Agent Workflow
 
-1. **Session start**: Agent calls `start_session` → gets full workspace briefing
-2. **During work**: Agent uses `store_memory`, `log_decision`, `add_lesson` to persist context
-3. **Searching**: Agent uses `recall` to find relevant past memories
-4. **Session end**: Agent calls `end_session` with a summary
+1. **Session start**: Agent calls `start_session` with `workspace` → gets full project briefing
+2. **During work**: Agent uses `store_memory`, `log_decision`, `add_lesson` with `workspace` to persist context
+3. **Searching**: Agent uses `recall` with `workspace` to find relevant past memories
+4. **Session end**: Agent calls `end_session` with `workspace` and a summary
 
 ## Configuration
 
-The server accepts:
+The server accepts these optional startup flags:
 
-- `--workspace <path>` — path to the project (default: current working directory)
-- `WORKSPACE_PATH` environment variable — alternative to `--workspace`
+- `--workspace <path>` — default workspace path (used when tools don't pass `workspace`)
+- `WORKSPACE_PATH` env var — alternative to `--workspace`
+
+If neither is set, the server runs in **global-only mode** until agents pass `workspace` in tool calls.
 
 ## Development
 
