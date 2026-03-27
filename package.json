@@ -23,9 +23,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nicholasgriffintn/local-agent-context.git"
+    "url": "git+https://github.com/tomiwaphilip/local-agent-context.git"
   },
-  "homepage": "https://github.com/nicholasgriffintn/local-agent-context#readme",
+  "homepage": "https://github.com/tomiwaphilip/local-agent-context#readme",
   "engines": {
     "node": ">=18.0.0"
   },
