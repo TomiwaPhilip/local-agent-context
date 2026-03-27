@@ -72,19 +72,19 @@ If you prefer a fixed workspace, pass `--workspace` at startup:
 
 ## How It Works
 
-**Dynamic workspace**: Every tool accepts an optional `workspace` parameter. Agents pass their current project root (e.g., `workspaceFolder`) per call. The server lazily opens and caches workspace databases on demand.
+**Name-based workspaces**: Every tool accepts an optional `workspace` parameter — the workspace or project name from your IDE (e.g., `"my-app"`). If a full path is passed instead, the basename is extracted automatically. The server lazily opens and caches workspace databases on demand.
 
 **Fallback chain**: Tool `workspace` arg → `--workspace` CLI flag → `WORKSPACE_PATH` env var → global-only mode.
 
-**Two-tier storage**:
-- **Workspace memory**: `<project>/.agent-context/memory.db` — project-specific memories
-- **Global memory**: `~/.local-agent-context/global.db` — cross-project preferences and patterns
+**Centralized storage** (nothing pollutes your project directories):
+- **Workspace memories**: `~/.local-agent-context/workspaces/<name>/memory.db`
+- **Global memory**: `~/.local-agent-context/global.db`
 
-Both are SQLite databases with FTS5 full-text search. Add `.agent-context/` to your `.gitignore`.
+Both are SQLite databases with FTS5 full-text search.
 
 ## Tools (10)
 
-All tools accept an optional `workspace` parameter — the absolute path to the project root. Pass it so the server knows which project's memory to use.
+All tools accept an optional `workspace` parameter — the project name (e.g., `"my-app"`) or path. Agents should pass the IDE's workspace/project name.
 
 ### Core Memory
 

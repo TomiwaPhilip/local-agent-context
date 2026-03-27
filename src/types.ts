@@ -59,8 +59,9 @@ export interface Session extends SessionRow {}
 // Shared workspace parameter — agents pass this dynamically so the server can
 // be configured once globally and work across any project.
 const workspaceParam = z.string().optional().describe(
-  "Absolute path to the project workspace. Required for workspace-scoped memories. " +
-  "Agents should pass the current project root (e.g. the workspaceFolder)."
+  "Workspace or project name (e.g. 'my-app'). Use the IDE workspace/project name. " +
+  "A full path also works — the basename will be used as the name. " +
+  "Required for workspace-scoped memories."
 );
 
 export const StoreMemorySchema = {

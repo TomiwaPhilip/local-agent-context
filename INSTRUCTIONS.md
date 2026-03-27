@@ -2,11 +2,11 @@
 
 You have access to a **local-agent-context** MCP server that provides persistent memory across coding sessions. Use it to store and recall project context, decisions, conventions, lessons learned, and tasks. This memory survives across conversations — anything you store now will be available in future sessions.
 
-**Always pass `workspace` with the absolute project root path in every tool call** so memories are scoped to the correct project.
+**Always pass `workspace` in every tool call** so memories are scoped to the correct project. Use the workspace or project name provided by the IDE (e.g., the folder name). If the name isn't available, pass the full path — the server will extract the name automatically.
 
 ## Session Lifecycle
 
-1. **Start of every conversation**: Call `start_session` with the workspace path and a brief goal. This returns a full context briefing — read it to orient yourself.
+1. **Start of every conversation**: Call `start_session` with the workspace name and a brief goal. This returns a full context briefing — read it to orient yourself.
 2. **During work**: Store important context as you go (see "What to Store" below).
 3. **End of conversation**: Call `end_session` with a summary of what was accomplished, decisions made, and anything the next session should know.
 
@@ -48,10 +48,10 @@ Store context **proactively** — don't wait to be asked. If something would be 
 ## Example Calls
 
 ```
-start_session({ workspace: "/path/to/project", summary: "Implementing user auth" })
+start_session({ workspace: "my-app", summary: "Implementing user auth" })
 
 store_memory({
-  workspace: "/path/to/project",
+  workspace: "my-app",
   type: "convention",
   title: "API error handling pattern",
   content: "All API routes use try/catch with AppError class. Errors return { error: string, code: number }.",
@@ -60,17 +60,17 @@ store_memory({
 })
 
 log_decision({
-  workspace: "/path/to/project",
+  workspace: "my-app",
   title: "JWT over session cookies",
   decision: "Use JWT tokens for API authentication",
   rationale: "Stateless, works with mobile clients, simpler horizontal scaling",
   tags: ["auth", "api"]
 })
 
-recall({ workspace: "/path/to/project", query: "authentication" })
+recall({ workspace: "my-app", query: "authentication" })
 
 end_session({
-  workspace: "/path/to/project",
+  workspace: "my-app",
   summary: "Implemented JWT auth with refresh tokens. Login/register endpoints working. Still need: password reset flow, rate limiting on auth endpoints."
 })
 ```

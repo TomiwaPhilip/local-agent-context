@@ -15,11 +15,13 @@ export interface DatabaseManager {
 }
 
 // ─── Connection Pool ────────────────────────────────────────────────────────
-// Lazily opens and caches database connections. Workspace DBs are opened on
-// demand when an agent passes a workspace path in a tool call.
+// Lazily opens and caches database connections. Workspace DBs are keyed by
+// name and stored centrally at ~/.local-agent-context/workspaces/<name>/.
+// Agents pass the workspace name (from the IDE) or a path (basename is used).
 
-const GLOBAL_DIR = path.join(os.homedir(), ".local-agent-context");
-const GLOBAL_DB_PATH = path.join(GLOBAL_DIR, "global.db");
+const BASE_DIR = path.join(os.homedir(), ".local-agent-context");
+const GLOBAL_DB_PATH = path.join(BASE_DIR, "global.db");
+const WORKSPACES_DIR = path.join(BASE_DIR, "workspaces");
 
 function ensureDir(dir: string): void {
   if (!fs.existsSync(dir)) {
@@ -32,6 +34,22 @@ function openDatabase(dbPath: string): Database.Database {
   const db = new Database(dbPath);
   initializeSchema(db);
   return db;
+}
+
+/**
+ * Resolve a workspace identifier (name or path) to a consistent name.
+ * - "/Users/admin/projects/my-app" → "my-app"
+ * - "my-app" → "my-app"
+ * - "C:\\Users\\dev\\my-app" → "my-app"
+ */
+function resolveWorkspaceName(workspace: string): string {
+  const trimmed = workspace.trim();
+  // Looks like an absolute path — extract basename
+  if (path.isAbsolute(trimmed)) {
+    return path.basename(trimmed);
+  }
+  // Already a name — sanitize it (remove path separators, keep it filesystem-safe)
+  return trimmed.replace(/[/\\:*?"<>|]/g, "-");
 }
 
 export class ConnectionPool {
@@ -50,13 +68,13 @@ export class ConnectionPool {
     }
   }
 
-  private getWorkspaceDb(workspacePath: string): Database.Database {
-    const resolved = path.resolve(workspacePath);
-    let db = this.workspaceDbs.get(resolved);
+  private getWorkspaceDb(workspace: string): Database.Database {
+    const name = resolveWorkspaceName(workspace);
+    let db = this.workspaceDbs.get(name);
     if (!db) {
-      const dbPath = path.join(resolved, ".agent-context", "memory.db");
+      const dbPath = path.join(WORKSPACES_DIR, name, "memory.db");
       db = openDatabase(dbPath);
-      this.workspaceDbs.set(resolved, db);
+      this.workspaceDbs.set(name, db);
     }
     return db;
   }
@@ -72,13 +90,13 @@ export class ConnectionPool {
 
   /**
    * Build a DatabaseManager for a single tool call.
-   * @param workspace — explicit workspace path from the tool args
+   * @param workspace — workspace name or path from the tool args.
    * Falls back to the default workspace (from --workspace CLI), then to a null DB.
    */
   getManager(workspace?: string): DatabaseManager {
-    const wsPath = workspace ?? this.defaultWorkspace;
-    const hasWorkspace = !!wsPath;
-    const wsDb = wsPath ? this.getWorkspaceDb(wsPath) : this.getNullDb();
+    const ws = workspace ?? this.defaultWorkspace;
+    const hasWorkspace = !!ws;
+    const wsDb = ws ? this.getWorkspaceDb(ws) : this.getNullDb();
 
     return {
       workspace: wsDb,
