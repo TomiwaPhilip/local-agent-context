@@ -10,6 +10,8 @@ export const MemoryType = z.enum([
   "lesson",           // Lessons learned, gotchas, things that went wrong
   "note",             // General-purpose notes
   "session_summary",  // Auto-generated session summaries
+  "resource",         // Documentation, URLs, and web resource summaries
+  "research",         // Research findings, investigations, and analysis
 ]);
 export type MemoryType = z.infer<typeof MemoryType>;
 
@@ -154,6 +156,27 @@ export const SyncInstructionsSchema = {
   path: z.string().optional().describe(
     "Explicit file path to write instructions to. If omitted, auto-detects installed IDEs (VS Code, Cursor) and syncs to all.",
   ),
+};
+
+export const StoreResourceSchema = {
+  workspace: workspaceParam,
+  title: z.string().describe("Descriptive title for the resource (e.g., 'React Server Components docs')"),
+  url: z.string().describe("URL of the resource"),
+  summary: z.string().describe("Summary of the resource content and key takeaways"),
+  tags: z.array(z.string()).optional().describe("Tags for categorization"),
+  importance: z.number().min(1).max(10).optional().describe("Importance 1-10 (default: 6)"),
+  scope: MemoryScope.optional().describe("'workspace' (default) or 'global'"),
+};
+
+export const StoreResearchSchema = {
+  workspace: workspaceParam,
+  title: z.string().describe("Title of the research topic (e.g., 'Best auth strategies for Next.js')"),
+  question: z.string().describe("The question or topic that was researched"),
+  findings: z.string().describe("Summary of findings, conclusions, and recommendations"),
+  sources: z.array(z.string()).optional().describe("URLs or references consulted during research"),
+  tags: z.array(z.string()).optional().describe("Tags for categorization"),
+  importance: z.number().min(1).max(10).optional().describe("Importance 1-10 (default: 7)"),
+  scope: MemoryScope.optional().describe("'workspace' (default) or 'global'"),
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

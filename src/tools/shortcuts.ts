@@ -63,3 +63,67 @@ export function addLesson(
     sessionId,
   );
 }
+
+// ─── store_resource ─────────────────────────────────────────────────────────
+
+export function storeResource(
+  manager: DatabaseManager,
+  args: {
+    title: string;
+    url: string;
+    summary: string;
+    tags?: string[];
+    importance?: number;
+    scope?: string;
+  },
+  sessionId?: string,
+): string {
+  const content = `**URL:** ${args.url}\n\n**Summary:** ${args.summary}`;
+
+  return storeMemory(
+    manager,
+    {
+      type: "resource",
+      title: args.title,
+      content,
+      tags: args.tags,
+      importance: args.importance ?? 6,
+      scope: args.scope,
+    },
+    sessionId,
+  );
+}
+
+// ─── store_research ─────────────────────────────────────────────────────────
+
+export function storeResearch(
+  manager: DatabaseManager,
+  args: {
+    title: string;
+    question: string;
+    findings: string;
+    sources?: string[];
+    tags?: string[];
+    importance?: number;
+    scope?: string;
+  },
+  sessionId?: string,
+): string {
+  const sourcesSection = args.sources?.length
+    ? `\n\n**Sources:**\n${args.sources.map((s) => `- ${s}`).join("\n")}`
+    : "";
+  const content = `**Question:** ${args.question}\n\n**Findings:** ${args.findings}${sourcesSection}`;
+
+  return storeMemory(
+    manager,
+    {
+      type: "research",
+      title: args.title,
+      content,
+      tags: args.tags,
+      importance: args.importance ?? 7,
+      scope: args.scope,
+    },
+    sessionId,
+  );
+}

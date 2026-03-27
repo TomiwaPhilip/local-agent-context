@@ -23,6 +23,8 @@ You have access to a **local-agent-context** MCP server that provides persistent
 | `recall` | Search for specific past memories by keyword. |
 | `log_decision` | Record an architectural or design decision with its rationale. |
 | `add_lesson` | Record a gotcha, mistake, or best practice discovered. |
+| `store_resource` | Save a summary of a doc page or URL you fetched, so future sessions can recall it. |
+| `store_research` | Save findings from a research investigation — questions, conclusions, sources. |
 | `list_memories` | Browse all memories, optionally filtered by type/tags. |
 | `update_memory` | Modify an existing memory (e.g., mark a task as resolved). |
 | `delete_memory` | Archive or remove a memory that's no longer relevant. |
@@ -40,6 +42,8 @@ Store context **proactively** — don't wait to be asked. If something would be 
 | `task` | A work item is identified, started, or needs tracking across sessions | 5-7 |
 | `lesson` | Something went wrong, a gotcha was found, or a best practice was learned (use `add_lesson`) | 6-8 |
 | `note` | General context that doesn't fit above categories | 3-5 |
+| `resource` | You fetch a doc page, URL, or web resource and want to save the key takeaways (use `store_resource`) | 6-8 |
+| `research` | You investigate a topic, compare options, or analyze solutions (use `store_research`) | 7-9 |
 
 **Importance guide**: 1-3 = minor/temporary, 4-6 = useful, 7-8 = important, 9-10 = critical (never forget).
 
@@ -85,4 +89,5 @@ end_session({
 - **Store decisions as you make them** — don't batch them at the end. Future sessions need to know *why* choices were made.
 - **Use `recall` before re-solving problems** — search for existing lessons and decisions before approaching a problem from scratch.
 - **End sessions with actionable summaries** — mention what's done, what's pending, and any blockers. The next session starts by reading this.
+- **Store research and resources** — when you fetch docs or investigate a topic, use `store_resource` or `store_research` to save findings. Future sessions can `recall` this instead of re-fetching.
 - **Tag consistently** — use lowercase, short tags. Reuse existing tags when possible (check with `list_memories`).

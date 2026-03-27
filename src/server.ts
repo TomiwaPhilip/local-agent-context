@@ -13,6 +13,8 @@ import {
   LogDecisionSchema,
   AddLessonSchema,
   SyncInstructionsSchema,
+  StoreResourceSchema,
+  StoreResearchSchema,
 } from "./types.js";
 import {
   storeMemory,
@@ -23,7 +25,7 @@ import {
 } from "./tools/memory.js";
 import { startSession, endSessionTool } from "./tools/session.js";
 import { getContext } from "./tools/context.js";
-import { logDecision, addLesson } from "./tools/shortcuts.js";
+import { logDecision, addLesson, storeResource, storeResearch } from "./tools/shortcuts.js";
 import { syncInstructions, getInstructions } from "./tools/instructions.js";
 import {
   workspaceContextResource,
@@ -36,7 +38,7 @@ import {
 export function createServer(pool: ConnectionPool): McpServer {
   const server = new McpServer({
     name: "local-agent-context",
-    version: "0.5.0",
+    version: "0.6.0",
   });
 
   // Helper: get current active session ID for linking memories
@@ -154,6 +156,26 @@ export function createServer(pool: ConnectionPool): McpServer {
     async (args) => ({
       content: [{ type: "text", text: syncInstructions(args) }],
     }),
+  );
+
+  server.tool(
+    "store_resource",
+    "Store a summary of a documentation page, URL, or web resource you fetched. Persists the key takeaways so future sessions can recall them without re-fetching.",
+    StoreResourceSchema,
+    async (args) => {
+      const manager = pool.getManager(args.workspace);
+      return { content: [{ type: "text", text: storeResource(manager, args, activeSessionId(args.workspace)) }] };
+    },
+  );
+
+  server.tool(
+    "store_research",
+    "Store findings from a research investigation — questions explored, conclusions reached, and sources consulted. Prevents re-researching the same topics in future sessions.",
+    StoreResearchSchema,
+    async (args) => {
+      const manager = pool.getManager(args.workspace);
+      return { content: [{ type: "text", text: storeResearch(manager, args, activeSessionId(args.workspace)) }] };
+    },
   );
 
   // ── Resources ─────────────────────────────────────────────────────────────
