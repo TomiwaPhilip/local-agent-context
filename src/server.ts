@@ -12,6 +12,7 @@ import {
   EndSessionSchema,
   LogDecisionSchema,
   AddLessonSchema,
+  SyncInstructionsSchema,
 } from "./types.js";
 import {
   storeMemory,
@@ -23,6 +24,7 @@ import {
 import { startSession, endSessionTool } from "./tools/session.js";
 import { getContext } from "./tools/context.js";
 import { logDecision, addLesson } from "./tools/shortcuts.js";
+import { syncInstructions, getInstructions } from "./tools/instructions.js";
 import {
   workspaceContextResource,
   recentSessionsResource,
@@ -145,6 +147,15 @@ export function createServer(pool: ConnectionPool): McpServer {
     },
   );
 
+  server.tool(
+    "sync_instructions",
+    "Sync the agent instruction file to installed IDEs (VS Code, Cursor). Call this after updating the server to ensure agents have the latest usage guide. Auto-detects IDE paths or accepts an explicit path.",
+    SyncInstructionsSchema,
+    async (args) => ({
+      content: [{ type: "text", text: syncInstructions(args) }],
+    }),
+  );
+
   // ── Resources ─────────────────────────────────────────────────────────────
   // Resources use the default workspace (from --workspace CLI flag).
   // For dynamic workspace access, use tools instead.
@@ -195,6 +206,19 @@ export function createServer(pool: ConnectionPool): McpServer {
         }],
       };
     },
+  );
+
+  server.resource(
+    "context://instructions",
+    "context://instructions",
+    { description: "The latest agent instructions bundled with the current server version. Always matches the running server." },
+    async () => ({
+      contents: [{
+        uri: "context://instructions",
+        mimeType: "text/markdown",
+        text: getInstructions(),
+      }],
+    }),
   );
 
   return server;

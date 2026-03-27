@@ -150,6 +150,12 @@ export const AddLessonSchema = {
   scope: MemoryScope.optional().describe("'workspace' (default) or 'global'"),
 };
 
+export const SyncInstructionsSchema = {
+  path: z.string().optional().describe(
+    "Explicit file path to write instructions to. If omitted, auto-detects installed IDEs (VS Code, Cursor) and syncs to all.",
+  ),
+};
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 export function rowToMemory(row: MemoryRow): Memory {
