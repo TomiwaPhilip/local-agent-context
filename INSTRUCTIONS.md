@@ -4,6 +4,8 @@ You have access to a **local-agent-context** MCP server that provides persistent
 
 **Always pass `workspace` in every tool call** so memories are scoped to the correct project. Use the workspace or project name provided by the IDE (e.g., the folder name). If the name isn't available, pass the full path — the server will extract the name automatically.
 
+**Important**: This instruction file may not reflect the latest version of the server. If you see tools you don't recognize, or if the server has tools not listed here, call `sync_instructions` to update this file with the latest documentation. You can also read the `context://instructions` resource for the most current version directly from the running server.
+
 ## Session Lifecycle
 
 1. **Start of every conversation**: Call `start_session` with the workspace name and a brief goal. This returns a full context briefing — read it to orient yourself.
@@ -24,6 +26,7 @@ You have access to a **local-agent-context** MCP server that provides persistent
 | `list_memories` | Browse all memories, optionally filtered by type/tags. |
 | `update_memory` | Modify an existing memory (e.g., mark a task as resolved). |
 | `delete_memory` | Archive or remove a memory that's no longer relevant. |
+| `sync_instructions` | Update this instruction file to the latest version from the server. Call when tools seem unfamiliar or after a server update. |
 
 ## What to Store
 
@@ -77,6 +80,7 @@ end_session({
 
 ## Key Behaviors
 
+- **If tools seem unfamiliar or you're unsure what's available**, call `sync_instructions` to update this file, or read the `context://instructions` resource directly. The server may have been updated with new tools since this file was written.
 - **Always start with `start_session`** — this loads all prior context so you don't repeat past mistakes or contradict past decisions.
 - **Store decisions as you make them** — don't batch them at the end. Future sessions need to know *why* choices were made.
 - **Use `recall` before re-solving problems** — search for existing lessons and decisions before approaching a problem from scratch.
