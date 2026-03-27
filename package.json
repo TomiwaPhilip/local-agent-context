@@ -7,13 +7,25 @@
   "bin": {
     "local-agent-context": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "INSTRUCTIONS.md",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": ["mcp", "agent", "memory", "context", "vscode", "cursor", "copilot"],
+  "keywords": ["mcp", "agent", "memory", "context", "vscode", "cursor", "copilot", "model-context-protocol", "sqlite"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholasgriffintn/local-agent-context.git"
+  },
+  "homepage": "https://github.com/nicholasgriffintn/local-agent-context#readme",
   "engines": {
     "node": ">=18.0.0"
   },
