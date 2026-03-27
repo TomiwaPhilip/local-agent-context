@@ -138,7 +138,7 @@ export function createServer(manager: DatabaseManager): McpServer {
   server.resource(
     "context://workspace",
     "context://workspace",
-    "Full workspace context: project info, active tasks, conventions, decisions, lessons, and global preferences",
+    { description: "Full workspace context: project info, active tasks, conventions, decisions, lessons, and global preferences" },
     async () => ({
       contents: [{
         uri: "context://workspace",
@@ -151,7 +151,7 @@ export function createServer(manager: DatabaseManager): McpServer {
   server.resource(
     "context://recent-sessions",
     "context://recent-sessions",
-    "Last 5 session summaries",
+    { description: "Last 5 session summaries" },
     async () => ({
       contents: [{
         uri: "context://recent-sessions",
@@ -164,7 +164,7 @@ export function createServer(manager: DatabaseManager): McpServer {
   server.resource(
     "context://active-tasks",
     "context://active-tasks",
-    "All active task memories",
+    { description: "All active task memories" },
     async () => ({
       contents: [{
         uri: "context://active-tasks",
