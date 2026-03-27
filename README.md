@@ -20,7 +20,7 @@ Configure once — works across all projects. Agents pass the workspace path dyn
     "agent-context": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "local-agent-context"]
+      "args": ["-y", "local-agent-context@latest"]
     }
   }
 }
@@ -33,7 +33,7 @@ Configure once — works across all projects. Agents pass the workspace path dyn
   "mcpServers": {
     "agent-context": {
       "command": "npx",
-      "args": ["-y", "local-agent-context"]
+      "args": ["-y", "local-agent-context@latest"]
     }
   }
 }
@@ -46,7 +46,7 @@ Configure once — works across all projects. Agents pass the workspace path dyn
   "mcpServers": {
     "agent-context": {
       "command": "npx",
-      "args": ["-y", "local-agent-context"]
+      "args": ["-y", "local-agent-context@latest"]
     }
   }
 }
@@ -64,7 +64,7 @@ If you prefer a fixed workspace, pass `--workspace` at startup:
     "agent-context": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "local-agent-context", "--workspace", "${workspaceFolder}"]
+      "args": ["-y", "local-agent-context@latest", "--workspace", "${workspaceFolder}"]
     }
   }
 }
