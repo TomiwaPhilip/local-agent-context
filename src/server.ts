@@ -36,7 +36,7 @@ import {
 export function createServer(pool: ConnectionPool): McpServer {
   const server = new McpServer({
     name: "local-agent-context",
-    version: "0.1.0",
+    version: "0.5.0",
   });
 
   // Helper: get current active session ID for linking memories
