@@ -152,6 +152,18 @@ The server accepts these optional startup flags:
 
 If neither is set, the server runs in **global-only mode** until agents pass `workspace` in tool calls.
 
+## Agent Instructions
+
+Copy [`INSTRUCTIONS.md`](INSTRUCTIONS.md) into your IDE's instruction system so agents automatically use this server:
+
+| IDE | Where to Add |
+|-----|-------------|
+| **VS Code (Copilot)** | Copy contents into `.github/copilot-instructions.md`, or save as `.github/instructions/agent-memory.instructions.md` |
+| **Cursor** | Copy contents into `.cursorrules` or `.cursor/rules/agent-memory.mdc` |
+| **Claude Desktop** | Paste into your Project Instructions |
+
+This teaches the agent to call `start_session` at the start of every conversation, store decisions/conventions/lessons as they arise, and call `end_session` with a summary at the end.
+
 ## Development
 
 ```bash
